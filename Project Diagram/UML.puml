@@ -1,0 +1,31 @@
+@startuml
+
+class main
+{
+    << makes calls here >>
+}
+
+class InitialInfo
+{
+    ' calculation model is (earned_credits / taken_credits)
+
+
+    ' the number of grades to be divided
+    - earned_credits
+    ' the number of credits to divide by
+    - taken_credits
+
+    ' the user that the info is related to
+    - user_owner
+}
+
+class NewInfo
+{
+    ' the list of classes added to the user (another class)
+    - credits_to_calculate
+}
+
+main <-down---> InitialInfo
+main <-down---> NewInfo
+
+@enduml
