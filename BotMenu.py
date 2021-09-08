@@ -1,35 +1,38 @@
 import os
 
+import discord
+from discord import Guild
 from discord.ext import commands
 from dotenv import load_dotenv
 
 # constants
 ONCE = 1
+UCF_LOGO = discord.File("imagesFolder/knights_logo.jpg", filename="knights_logo.jpg")
 
 # opens the '.env' file and stores its content
 load_dotenv('venv/.env')
 TOKEN = os.getenv('TOKEN')
 
 # set the Bot's prefix to '$'
-client = commands.Bot(command_prefix='$')
+bot = commands.Bot(command_prefix='$')
 
 
 # user = discord.Member //  not sure what this means
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+    print(f'{bot.user} has connected to Discord!')
 
 
 # TEST COMMAND (DELETE THIS LATER)
-@client.command()
+@bot.command()
 async def what(ctx):
     await ctx.channel.send('This command is working')
 
 
 # TEST COMMAND (DELETE THIS LATER)
-@client.command()
+@bot.command()
 async def getInput(ctx):
     # gets message content
     message = ctx.message.content
@@ -47,10 +50,19 @@ async def getInput(ctx):
 
 
 # initiates the GPA calculation process
-@client.command()
+@bot.command()
 async def calculate(ctx):
+    # parse user input
     user_values = parseInputNums(ctx)
+
+    # calculates the GPA
     final_GPA = user_values[0] / user_values[1]
+
+    # checks if the GPA is valid
+    if final_GPA < 0 or final_GPA > 4:
+        await ctx.channel.send('Invalid Input')
+        return
+
     await ctx.channel.send(f'GPA = {final_GPA}')
 
 
@@ -70,17 +82,29 @@ def parseInputNums(ctx):
 # FIX ABOVE **************************************************************
 
 
+@bot.command()
+async def show_embed(message):
+
+    # create Embed
+    embed = discord.Embed(
+        title='Class List',
+        description="To add classes, use `$add`", # improve description
+        colour=discord.Colour.gold()
+    )
+
+    # add the UCF logo to embed
+    embed.set_author(name='UCF GPA Calculator', icon_url="attachment://knights_logo.jpg")
+
+    # display empty fields
+    embed.add_field(name='Class Names', value='`Empty`', inline=True)
+    embed.add_field(name='Class Credit', value='`Empty`', inline=True)
+
+    await message.channel.send(file=UCF_LOGO, embed=embed)
 
 
-
-
-
-
-
-
-# @client.event
+# @bot.event
 # async def on_message(message):
-#     if message.author == client.user:
+#     if message.author == bot.user:
 #         return
 #
 #     # testing command
@@ -99,4 +123,4 @@ def parseInputNums(ctx):
 #         await message.author.send("DM to " + str(message.mentions[0].display_name) + " worked")
 
 
-client.run(TOKEN)
+bot.run(TOKEN)
