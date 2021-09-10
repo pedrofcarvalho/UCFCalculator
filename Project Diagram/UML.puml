@@ -5,27 +5,34 @@ class main
     << makes calls here >>
 }
 
-class InitialInfo
+class OldClassesInfo
 {
-    ' calculation model is (earned_credits / taken_credits)
-
+    ' GPA calculation model is (earned_credits / taken_credits)
 
     ' the number of grades to be divided
     - earned_credits
     ' the number of credits to divide by
     - taken_credits
-
-    ' the user that the info is related to
-    - user_owner
 }
 
-class NewInfo
+class NewClassesInfo
 {
     ' the list of classes added to the user (another class)
-    - credits_to_calculate
+    - course_name
+    - course_grade
+    - course_credit_hours
 }
 
-main <-down---> InitialInfo
-main <-down---> NewInfo
+class User
+{
+    - current_info
+    - new_classes_list
+    - last_embed_id
+    - discord_user
+}
+
+' relates User with other classes
+User *-down--- OldClassesInfo
+User *-down--- NewClassesInfo
 
 @enduml
