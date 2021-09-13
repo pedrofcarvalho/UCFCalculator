@@ -3,6 +3,7 @@
 class main
 {
     << makes calls here >>
+    + list of users (testing)
 }
 
 class OldClassesInfo
@@ -34,5 +35,6 @@ class User
 ' relates User with other classes
 User *-down--- OldClassesInfo
 User *-down--- NewClassesInfo
+main *-down-- User
 
 @enduml
