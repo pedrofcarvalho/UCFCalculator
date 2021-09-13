@@ -77,7 +77,10 @@ class User:
         self.__current_info = OldClassesInfo(earned_credits, credits_taken)
 
         # List will be empty AT FIRST
-        self.__new_classes_list = []
+        self.__new_classes_list = list[NewClassesInfo]
+
+        # size of list
+        self.__class_list_size = int()
 
         # Reference to the last embed (for deletion purposes)
         self.__last_embed_id = int()
@@ -86,16 +89,19 @@ class User:
         self.__discord_user = str()
 
     # getters
-    def get_current_info(self):
+    async def get_current_info(self):
         return self.__current_info
 
-    def get_class_list(self):
+    async def get_class_list(self):
         return self.__new_classes_list
 
-    def get_last_embed(self):
+    async def get_list_size(self):
+        return self.__class_list_size
+
+    async def get_last_embed(self):
         return self.__last_embed_id
 
-    def get_discord_user(self):
+    async def get_discord_user(self):
         return self.__discord_user
 
     # setters
@@ -106,13 +112,15 @@ class User:
         self.__discord_user = discord_user
 
     # creates and add a new class to the User() list of new classes
-    def add_to_class_to_List(self, course_name, course_grade, course_credit_hours):
+    async def add_class(self, course_name, course_grade, course_credit_hours: int):
 
-        # create new class object
-        new_element = NewClassesInfo(course_name, course_grade, course_credit_hours)
+        # create and add new class to the list
+        self.__new_classes_list.append(NewClassesInfo(course_name, course_grade, course_credit_hours))
 
-        # adds new class to the List
-        self.__new_classes_list.append(new_element)
+        # increments list size
+        self.__class_list_size += 1
+
+
 
     # mainly for debugging purposes
     def print_User(self):
