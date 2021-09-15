@@ -28,7 +28,11 @@ async def on_ready():
 # initiates the GPA calculation process
 @bot.command(name="calculateGPA", aliases=["GPA", "calculate"])
 async def calculateGPA(ctx, credit_points: float, credits_taken: float):
-    single_user.get_class_list()
+    if single_user.get_last_embed() is not None:
+        await ctx.channel.send(f'{ctx.author.mention}, you have a GPA session open')
+        return
+
+    single_user.set_discord_user(ctx.author)
 
     # calculates the GPA
     final_GPA = round(credit_points / credits_taken, 2)
@@ -38,7 +42,8 @@ async def calculateGPA(ctx, credit_points: float, credits_taken: float):
         await ctx.channel.send('Invalid Input')
         return
 
-    await show_embed(ctx, final_GPA, ctx.author)
+    # call empty embed
+    await show_embed(ctx, final_GPA, single_user, name='*Empty*', grade='*Empty*', hours='*Empty*')
 
 
 @bot.command(name="delete")
@@ -47,60 +52,67 @@ async def clear(ctx):
     await message.delete()
 
 
-# TODO - MAKE THE CLASS DESIGN BETTER HERE
 @bot.command(name="add", aliases=["ass"])
 async def add(ctx, class_name, class_grade, class_credit: int):
-    # adds a new class to the user's list based on user input
-    await single_user.add_class(class_name, class_grade, class_credit)
 
-    CHANGE = await display_classes_on_embed(await single_user.get_class_list(), await single_user.get_list_size())
-    print(CHANGE)
+    if single_user.get_last_embed() is None:
+        await ctx.channel.send(f'{ctx.author.mention}, calculate your GPA first!')
+        return
+
+    # delete last embed (CHANGE USER LATER)
+    await ctx.channel.delete_messages([discord.Object(id=single_user.get_last_message())])
+
+    # adds a new class to the user's list based on user input
+    single_user.add_class(class_name, class_grade, class_credit)
+
+    # makes the call to display on embed
+    await display_classes_on_embed(ctx, single_user)
 
 
 # general methods
+async def show_embed(message, gpa, user, name, grade, hours):
 
-async def show_embed(message, GPA, curr_user):
-    test = ['hello', 'this', 'is', 'a', 'test']
+    if user.get_last_embed() is not None:
+        embed = user.get_last_embed()
+        embed.set_field_at(index=0, name='Class Names', value=name, inline=True)
+        embed.set_field_at(index=1, name='Class Grades', value=grade, inline=True)
+        embed.set_field_at(index=2, name='Class Credit', value=hours, inline=True)
 
-    # create Embed
-    embed = discord.Embed(
-        title='Class List',
-        description=f'Current GPA is `{GPA}`' + '\n\n',
-        colour=discord.Colour.gold()
-    )
+    # creating the embed for the first time
+    else:
+        # create Embed
+        new_embed = discord.Embed(
+            title='Class List',
+            description=f'{message.author.mention} GPA is `{gpa}`' + '\n\n',
+            colour=discord.Colour.gold()
+        )
 
-    # display empty fields
-    embed.add_field(name='Class Names', value='test1\ntest2', inline=True)
-    embed.add_field(name='Class Grades', value='*Empty*', inline=True)
-    embed.add_field(name='Class Credit', value='*Empty*', inline=True)
+        # display empty fields
+        new_embed.add_field(name='Class Names', value=name, inline=True)
+        new_embed.add_field(name='Class Grades', value=grade, inline=True)
+        new_embed.add_field(name='Class Credit', value=hours, inline=True)
+
+        # set the new embed to the newly create one (CHANGE THE USER)
+        user.set_user_embed(new_embed)
 
     # send to the channel
-    await message.channel.send(embed=embed)
+    await message.channel.send(embed=user.get_last_embed())  # CHANGE THE USER
+
+    # set the last message to user info
+    user.set_last_message(message.channel.last_message_id)   # CHANGE THE USER
 
 
-# @bot.command()
-async def display_classes_on_embed(classes_list: list[UserInfo.NewClassesInfo], list_length):
-    NAME_INDEX = 0
-    GRADE_INDEX = 1
-    CREDIT_INDEX = 2
+async def display_classes_on_embed(ctx, user: UserInfo.User):
+    # calculate current user's GPA
+    gpa = user.get_current_info().get_earned_credits() / user.get_current_info().get_taken_credits()
 
-    final_list = ['', '', '']
+    # "increments" the string data representation
+    user.concatenate_name_str()
+    user.concatenate_grades_str()
+    user.concatenate_hours_str()
 
-    # if list is empty, return "empty" list
-    if not classes_list:
-        return ['*Empty*', '*Empty*', '*Empty*']
-
-    for each_index in range(list_length):
-        final_list[NAME_INDEX] += classes_list.get_course_name() + '\n'
-    #
-    # for each_index in range(list_length):
-    #     final_list[GRADE_INDEX] += classes_list.get_course_grade() + '\n'
-    #
-    # for each_index in range(list_length):
-    #     final_list[CREDIT_INDEX] += classes_list.get_credit_hours() + '\n'
-
-    print(final_list)   # debug
-    return final_list
+    # display embed
+    await show_embed(ctx, gpa, user, user.get_name_str(), user.get_grades_str(), user.get_hours_str())
 
 
 bot.run(TOKEN)
