@@ -8,3 +8,4 @@
 - Error handling 
 - Double-check design
 - Marketing Status (Bot personality, name, etc...)
+- Create documentation and help command
