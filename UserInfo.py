@@ -72,14 +72,6 @@ class NewClassesInfo:
         self.__course_credit_hours = course_credit_hours
 
 
-class EmbedStringInfo:
-    # constructor - all attributes are PRIVATE
-    def __init__(self):
-        self.__class_names = str()
-        self.__grades = str()
-        self.__credit_hours = str()
-
-
 # wrapper class (will contain all info from a user)
 class User:
 
