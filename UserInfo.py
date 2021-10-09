@@ -1,54 +1,16 @@
 
-# there should have only one object for this class
-class OldClassesInfo:
-
-    # constructor - all attributes are PRIVATE
-    def __init__(self, earned_credits, credits_taken):
-        self.__earned_credits = earned_credits
-        self.__taken_credits = credits_taken
-
-    # getters
-    def get_earned_credits(self):
-        return self.__earned_credits
-
-    def get_taken_credits(self):
-        return self.__taken_credits
-
-    # setters
-    def set_earned_credits(self, new_value):
-        self.__earned_credits = new_value
-
-    def set_taken_credits(self, new_value):
-        self.__taken_credits = new_value
-
-    # test (debug)
-    def displayTest(self):
-        print(f'earned credits: {self.get_earned_credits()}')
-        print(f'taken credits: {self.get_taken_credits()}')
-
-
 # there will have a list of this class
 class NewClassesInfo:
 
-    # constructor - all attributes are PRIVATE
+    # constructor - all attributes are PRIVATE (under Python restrictions)
     def __init__(self, course_name, course_grade, course_credit_hours):
 
         # attributes that will be used as the string representation
         self.__course_name = course_name
 
-        # attributes that will be used as the ACTUAL DATA (MAKE A LIST FOR EACH IN USER() INSTEAD)
+        # holds the
         self.__course_grade = course_grade
         self.__course_credit_hours = course_credit_hours
-
-    def __str__(self):
-        return f"NewClassesInfo @{id(self)}(course_name={self.get_course_name()}, " \
-               f"course_grade={self.get_course_grade()}, " \
-               f"credit_hours={self.get_credit_hours()})"
-
-    def __repr__(self):
-        return f"NewClassesInfo @{id(self)}(course_name={self.get_course_name()}, " \
-               f"course_grade={self.get_course_grade()}, " \
-               f"credit_hours={self.get_credit_hours()})"
 
     # getters
     def get_course_name(self):
@@ -75,35 +37,36 @@ class NewClassesInfo:
 # wrapper class (will contain all info from a user)
 class User:
 
-    # constructor - all attributes are PRIVATE
-    def __init__(self, earned_credits, credits_taken):
+    # constructor - all attributes are PRIVATE (under Python restrictions)
+    def __init__(self, earned_credits, taken_credits):
         # embed-used string attributes
         self.__names_str = str()
         self.__grades_str = str()
         self.__hours_str = str()
 
-        # can only create a User() with current info
-        self.__current_info = OldClassesInfo(earned_credits, credits_taken)
+        # main info for GPA calculation
+        self.__taken_credits = taken_credits
+        self.__earned_credits = earned_credits
 
         # list will be empty AT FIRST
-        self.__new_classes_list = []
+        self.__new_classes_list = list()
 
         # size of list
-        self.__class_list_size = int()
+        self.__class_list_size = int(0)
 
-        # Reference to the last embed (for deletion purposes)
-        self.__last_message_id = int()
+        # reference to the last embed id (for deletion purposes)
+        self.__last_message_id = int(0)
 
-        # last created embed
+        # reference to the last created embed
         self.__last_embed = None
-
-        # Discord user that is the owner of the data
-        self.__discord_user = str()
 
 
     # getters
-    def get_current_info(self):
-        return self.__current_info
+    def get_earned_credits(self):
+        return self.__earned_credits
+
+    def get_taken_credits(self):
+        return self.__taken_credits
 
     def get_classes(self):
         return self.__new_classes_list
@@ -119,9 +82,6 @@ class User:
 
     def get_last_message(self):
         return self.__last_message_id
-
-    def get_discord_user(self):
-        return self.__discord_user
 
     def get_name_str(self):
         return self.__names_str
@@ -140,9 +100,6 @@ class User:
     def set_last_message(self, last_id):
         self.__last_message_id = last_id
 
-    def set_discord_user(self, discord_user):
-        self.__discord_user = discord_user
-
 
     # creates and add a new class to the User() list of new classes
     def add_class(self, course_name, course_grade, course_credit_hours: int):
@@ -153,7 +110,7 @@ class User:
         # increments list size
         self.__class_list_size += 1
 
-
+    # the following concatenation methods add the newly created
     def concatenate_name_str(self):
         last_element = self.__new_classes_list[self.__class_list_size - 1]
         self.__names_str += last_element.get_course_name() + '\n'
@@ -166,10 +123,18 @@ class User:
         last_element = self.__new_classes_list[self.__class_list_size - 1]
         self.__hours_str += str(last_element.get_credit_hours()) + '\n'
 
+    # increments user's current credits
+    def add_earned_credits(self, value):
+        self.__earned_credits += value
 
-    # mainly for debugging purposes
-    def print_User(self):
-        print(f'[{self.__names_str}, {self.__grades_str}, {self.__hours_str}]')
+    # increments user's current taken credits
+    def add_taken_credits(self, value):
+        self.__taken_credits += value
+
+
+
+
+
 
 
 
