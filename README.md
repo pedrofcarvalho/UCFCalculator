@@ -17,9 +17,8 @@ to a more personal experience for grade expeculation or/and calculation!
 
 ### Coming out soon:
 - Change Bot-to-User communication method
-  * from server based to direct message based
-
-
+  - from server based to direct message based
+  
 - Error handling 
 - Global customization implementation (server-to-server customization)
 - Implement good help command
